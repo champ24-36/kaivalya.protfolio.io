@@ -1,0 +1,223 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700;800;900&display=swap');
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: 'Inter', sans-serif;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #1a1a1a;
+}
+
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, #8b5cf6, #a855f7);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(180deg, #7c3aed, #9333ea);
+}
+
+/* Animation keyframes */
+@keyframes fade-in-up {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-20px);
+  }
+}
+
+@keyframes glow {
+  0%, 100% {
+    text-shadow: 0 0 20px rgba(139, 92, 246, 0.5), 0 0 40px rgba(139, 92, 246, 0.3);
+  }
+  50% {
+    text-shadow: 0 0 30px rgba(139, 92, 246, 0.8), 0 0 60px rgba(139, 92, 246, 0.5);
+  }
+}
+
+.animate-fade-in-up {
+  animation: fade-in-up 1s ease-out;
+}
+
+.animate-float {
+  animation: float 6s ease-in-out infinite;
+}
+
+.animate-glow {
+  animation: glow 2s ease-in-out infinite;
+}
+
+@keyframes blink {
+  0%, 50% { opacity: 1; }
+  51%, 100% { opacity: 0; }
+}
+
+.animate-blink {
+  animation: blink 1s infinite;
+}
+.hero-content h1, .hero-content h2 {
+  animation: text-glow 3s ease-in-out infinite;
+}
+
+/* Smooth scroll behavior */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Enhanced parallax effect */
+.parallax-bg {
+  will-change: transform;
+  transform: translateZ(0);
+}
+
+/* Custom gradient backgrounds */
+.bg-gradient-cosmic {
+  background: linear-gradient(135deg, #0c0c0c 0%, #2d1b69 50%, #0c0c0c 100%);
+}
+
+.bg-gradient-purple-black {
+  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f0f23 100%);
+}
+
+/* Text gradient effects */
+.text-gradient-purple {
+  background: linear-gradient(135deg, #8b5cf6, #ec4899, #a855f7);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Card hover effects */
+.card-hover {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.card-hover:hover {
+  transform: translateY(-8px) scale(1.02);
+  box-shadow: 0 20px 40px rgba(139, 92, 246, 0.2);
+}
+
+/* Button effects */
+.btn-primary {
+  background: linear-gradient(135deg, #8b5cf6, #ec4899);
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.btn-primary::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  transition: left 0.5s;
+}
+
+.btn-primary:hover::before {
+  left: 100%;
+}
+
+/* Responsive typography */
+@media (max-width: 768px) {
+  .text-responsive-xl {
+    font-size: 2.5rem;
+  }
+  
+  .text-responsive-2xl {
+    font-size: 3rem;
+  }
+  
+  .text-responsive-3xl {
+    font-size: 3.5rem;
+  }
+}
+
+/* Loading animation */
+.loading-dots {
+  display: inline-block;
+}
+
+.loading-dots::after {
+  content: '';
+  animation: loading 1.5s infinite;
+}
+
+@keyframes loading {
+  0% { content: ''; }
+  25% { content: '.'; }
+  50% { content: '..'; }
+  75% { content: '...'; }
+}
+
+/* Parallax effect */
+.parallax {
+  transform: translateZ(0);
+  will-change: transform;
+}
+
+/* Glass morphism effect */
+.glass {
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Custom focus styles */
+.focus-purple:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.5);
+}
+
+/* Smooth transitions for all interactive elements */
+a, button, .interactive {
+  transition: all 0.3s ease;
+}
+
+/* Hide scrollbar for mobile */
+@media (max-width: 768px) {
+  .hide-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  
+  .hide-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+}
