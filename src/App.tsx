@@ -5,9 +5,12 @@ const App = () => {
   const [scrollY, setScrollY] = useState(0);
   const [activeSection, setActiveSection] = useState('home');
   const [heroAnimationStage, setHeroAnimationStage] = useState(0);
-  const [currentTitleIndex, setCurrentTitleIndex] = useState(0);
-  const [displayedTitle, setDisplayedTitle] = useState('');
-  const [isTyping, setIsTyping] = useState(false);
+  const [titleState, setTitleState] = useState({
+    currentIndex: 0,
+    displayedText: '',
+    isTyping: true,
+    charIndex: 0
+  });
 
   const titles = [
     'GitHub Contributor',
@@ -60,53 +63,61 @@ const App = () => {
 
   // Typing animation effect
   useEffect(() => {
-    let typeInterval: NodeJS.Timeout;
-    let deleteInterval: NodeJS.Timeout;
-    let waitTimeout: NodeJS.Timeout;
+    if (heroAnimationStage < 4) return;
 
-    const typeTitle = () => {
-      const currentTitle = titles[currentTitleIndex];
-      setIsTyping(true);
-      setDisplayedTitle(''); // Reset displayed title for new cycle
-      
-      let charIndex = 0;
-      typeInterval = setInterval(() => {
-        if (charIndex <= currentTitle.length) {
-          setDisplayedTitle(currentTitle.slice(0, charIndex));
-          charIndex++;
+    const interval = setInterval(() => {
+      setTitleState(prev => {
+        const currentTitle = titles[prev.currentIndex];
+        
+        if (prev.isTyping) {
+          // Typing phase
+          if (prev.charIndex < currentTitle.length) {
+            return {
+              ...prev,
+              displayedText: currentTitle.slice(0, prev.charIndex + 1),
+              charIndex: prev.charIndex + 1
+            };
+          } else {
+            // Finished typing, wait then start deleting
+            setTimeout(() => {
+              setTitleState(current => ({ ...current, isTyping: false }));
+            }, 2000);
+            return prev;
+          }
         } else {
-          clearInterval(typeInterval);
-          setIsTyping(false);
-          
-          // Wait before starting to delete
-          waitTimeout = setTimeout(() => {
-            let deleteIndex = currentTitle.length;
-            deleteInterval = setInterval(() => {
-              if (deleteIndex >= 0) {
-                setDisplayedTitle(currentTitle.slice(0, deleteIndex));
-                deleteIndex--;
-              } else {
-                clearInterval(deleteInterval);
-                // Move to the next title
-                setCurrentTitleIndex((prev) => (prev + 1) % titles.length);
-              }
-            }, 100); // Increased deleting speed to 100ms
-          }, 2500); // Increased wait time before deleting to 2.5 seconds
+          // Deleting phase
+          if (prev.charIndex > 0) {
+            return {
+              ...prev,
+              displayedText: currentTitle.slice(0, prev.charIndex - 1),
+              charIndex: prev.charIndex - 1
+            };
+          } else {
+            // Finished deleting, move to next title
+            return {
+              currentIndex: (prev.currentIndex + 1) % titles.length,
+              displayedText: '',
+              isTyping: true,
+              charIndex: 0
+            };
+          }
         }
-      }, 200); // Increased typing speed to 200ms
-    };
+      });
+    }, titleState.isTyping ? 100 : 50); // Typing speed vs deleting speed
 
-    if (heroAnimationStage >= 4) {
-      typeTitle();
+    return () => clearInterval(interval);
+  }, [heroAnimationStage, titleState.isTyping]);
+
+  useEffect(() => {
+    if (heroAnimationStage >= 4 && titleState.displayedText === '') {
+      setTitleState({
+        currentIndex: 0,
+        displayedText: '',
+        isTyping: true,
+        charIndex: 0
+      });
     }
-
-    // Cleanup function to clear intervals/timeouts when component unmounts or dependencies change
-    return () => {
-      clearInterval(typeInterval);
-      clearInterval(deleteInterval);
-      clearTimeout(waitTimeout);
-    };
-  }, [currentTitleIndex, heroAnimationStage, titles]); // Dependencies ensure effect re-runs when title index changes
+  }, [heroAnimationStage]);
 
   const scrollToSection = (sectionId: string) => {
     const element = document.getElementById(sectionId);
@@ -174,14 +185,13 @@ const App = () => {
         {[...Array(20)].map((_, i) => (
           <div
             key={i}
-            className="absolute animate-pulse"
+            className="absolute"
             style={{
               left: `${Math.random() * 100}%`,
-              top: `${Math.random() * 100}%`,
-              animationDuration: `${2 + Math.random() * 3}s`
+              top: `${Math.random() * 100}%`
             }}
           >
-            <div className="w-1 h-1 bg-purple-400 rounded-full"></div>
+            <div className="w-1 h-1 bg-purple-400 rounded-full opacity-30"></div>
           </div>
         ))}
       </div>
@@ -225,6 +235,7 @@ const App = () => {
         <div className="max-w-7xl mx-auto px-4 h-full flex items-center">
           <div 
             className="grid lg:grid-cols-2 gap-12 items-center w-full z-10 transition-all duration-1000"
+            // Removed scroll-fade animation styles from here
           >
             {/* Left Content */}
             <div className="space-y-6">
@@ -234,7 +245,7 @@ const App = () => {
                     heroAnimationStage >= 1 ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
                   }`}
                 >
-                  Hi There! 👋
+                  Hi There! <span className="inline-block animate-wave">👋</span>
                 </h1>
                 <h2 
                   className={`text-4xl md:text-6xl font-bold transition-all duration-1000 delay-500 ${
@@ -255,8 +266,10 @@ const App = () => {
                     heroAnimationStage >= 4 ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
                   }`}
                 >
-                  {displayedTitle}
-                  <span className={`inline-block w-0.5 h-6 bg-purple-400 ml-1 ${isTyping ? 'animate-pulse' : 'animate-blink'}`}></span>
+                  <span className="text-purple-300">
+                    {titleState.displayedText}
+                    <span className="animate-blink">|</span>
+                  </span>
                 </div>
               </div>
               <p 
@@ -264,10 +277,8 @@ const App = () => {
                   heroAnimationStage >= 4 ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
                 }`}
               >
-                I craft exceptional digital experiences through clean code and thoughtful design. 
-                Passionate about creating solutions that make a difference.
-
-
+                Computer Science undergraduate passionate about AI, mental health technology, and legal tech. 
+                I build meaningful solutions that empower underserved communities.
               </p>
               <button
                 className={`bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white px-8 py-4 rounded-full text-lg font-semibold transition-all duration-300 transform hover:scale-105 hover:shadow-2xl hover:shadow-purple-500/25 ${
